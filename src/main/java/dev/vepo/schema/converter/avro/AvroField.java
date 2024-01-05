@@ -1,6 +1,7 @@
 package dev.vepo.schema.converter.avro;
 
 import dev.vepo.schema.converter.schema.Field;
+import dev.vepo.schema.converter.schema.Type;
 
 public class AvroField implements Field {
 
@@ -29,6 +30,27 @@ public class AvroField implements Field {
     @Override
     public boolean union() {
         return field.schema().isUnion();
+    }
+
+    @Override
+    public Type type() {
+        switch (field.schema().getType()) {
+            case STRING:
+                return Type.STRING;
+            case ARRAY:
+                return Type.ARRAY;
+
+        }
+        return Type.UNDEFINED;
+    }
+
+    @Override
+    public Type items() {
+        switch (field.schema().getValueType().getType()) {
+            case STRING:
+                return Type.STRING;
+        }
+        return Type.UNDEFINED;
     }
 
 }

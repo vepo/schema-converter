@@ -10,4 +10,8 @@ public interface Field {
     public static boolean areEquals(Field f1, Field f2) {
         return Objects.equals(f1.name(), f2.name());
     }
+
+    Type type();
+
+    Type items();
 }
