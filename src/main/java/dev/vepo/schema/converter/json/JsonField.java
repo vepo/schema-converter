@@ -28,4 +28,9 @@ public class JsonField implements Field {
         }
     }
 
+    @Override
+    public boolean union() {
+        return true;
+    }
+
 }

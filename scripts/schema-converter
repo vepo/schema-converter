@@ -1,0 +1,63 @@
+///usr/bin/env jbang "$0" "$@" ; exit $?
+
+//REPOS https://repo1.maven.org/maven2/
+//REPOS https://packages.confluent.io/maven/
+
+//DEPS info.picocli:picocli:4.6.3
+//DEPS io.confluent:kafka-connect-json-schema-converter:7.5.1
+//DEPS io.confluent:kafka-connect-avro-converter:7.5.1
+//DEPS com.fasterxml.jackson.core:jackson-databind:2.16.1
+//DEPS org.apache.kafka:connect-api:3.6.1
+//DEPS org.apache.kafka:connect-json:3.6.1
+//DEPS org.slf4j:slf4j-api:2.0.10
+//DEPS ch.qos.logback:logback-classic:1.3.14
+
+import static io.confluent.connect.json.JsonSchemaDataConfig.USE_OPTIONAL_FOR_NON_REQUIRED_CONFIG;
+
+import picocli.CommandLine;
+import picocli.CommandLine.*;
+import java.io.File;
+import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.avro.Schema.Parser;
+import org.apache.avro.Schema;
+
+import io.confluent.connect.avro.AvroData;
+import io.confluent.connect.json.JsonSchemaData;
+import io.confluent.connect.json.JsonSchemaDataConfig;
+import io.confluent.kafka.schemaregistry.json.JsonSchema;
+
+import java.util.concurrent.Callable;
+
+@Command(name = "SchemaConverter", mixinStandardHelpOptions = true, version = "SchemaConverter 0.1",
+        description = "SchemaConverter made with jbang")
+class SchemaConverter implements Callable<Integer> {
+
+    enum Type {AVRO2JSON, JSON2AVRO}
+
+    @Option(names = {"-i", "--input"}, description = "Input Schema")
+    private File input;
+
+    @Option(names = {"-t", "--type"}, description = "Conversion type: ${COMPLETION-CANDIDATES}")
+    private Type type;
+
+    public static void main(String... args) {
+        int exitCode = new CommandLine(new SchemaConverter()).execute(args);
+        System.exit(exitCode);
+    }
+
+    @Override
+    public Integer call() throws Exception { // your business logic goes here...
+        Map<String, Object> jsonSchemaDataConfigMap = new HashMap<>();
+        jsonSchemaDataConfigMap.put(USE_OPTIONAL_FOR_NON_REQUIRED_CONFIG, true);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonSchemaData jsonData = new JsonSchemaData(new JsonSchemaDataConfig(jsonSchemaDataConfigMap));
+        AvroData avroData = new AvroData(1000);
+        Parser parser = new Parser();
+        Schema schema = parser.parse(input);
+        System.out.println(schema);
+        System.out.println(jsonData.fromConnectSchema(avroData.toConnectSchema(schema)));
+        return 0;
+    }
+}

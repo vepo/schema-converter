@@ -1,31 +1,50 @@
 {
     "type": "record",
     "namespace": "dev.vepo",
-    "name": "Fruits",
-    "doc": "A representation of a person, company, organization, or place",
+    "name": "Person",
+    "doc": "Object representing a person",
     "fields": [
         {
-            "name": "fruits",
+            "name": "name",
+            "type": "string"
+        },
+        {
+            "name": "surname",
+            "type": "string"
+        },
+        {
+            "name": "phones",
             "type": {
                 "type": "array",
                 "items": "string"
             }
         },
         {
-            "name": "vegetables",
+            "name": "addresses",
             "type": {
                 "type": "array",
                 "items": {
                     "type": "record",
-                    "name": "veggie",
+                    "name": "Address",
                     "fields": [
                         {
-                            "name": "veggieName",
+                            "name": "street",
                             "type": "string"
                         },
                         {
-                            "name": "veggieLike",
-                            "type": "boolean"
+                            "name": "number",
+                            "type": [
+                                "null",
+                                "string",
+                                "int"
+                            ]
+                        },
+                        {
+                            "name": "complement",
+                            "type": [
+                                "null",
+                                "string"
+                            ]
                         }
                     ]
                 }

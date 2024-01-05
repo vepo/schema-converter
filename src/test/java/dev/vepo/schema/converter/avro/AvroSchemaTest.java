@@ -19,6 +19,6 @@ public class AvroSchemaTest {
         AvroSchema schema = new AvroSchema(getClass().getResourceAsStream("/avro/sample-1.json"));
         assertEquals(original.getName(), schema.getName());
         assertThat(schema.getFields()).extracting(Field::name)
-                                      .containsExactly("fruits", "vegetables");
+                                      .containsExactly("name", "surname", "phones", "addresses");
     }
 }

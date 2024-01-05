@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -18,7 +19,8 @@ import dev.vepo.schema.converter.schema.Schema;
 
 public class JsonSchema implements Schema {
 
-    private static final String FULL_NAME_REGEX = "\\A([a-zA-Z][a-zA-Z0-9]*(?:\\.[a-zA-Z][a-zA-Z0-9]*)*)\\.([a-zA-Z][a-zA-Z0-9]*)\\z";
+    private static final String FULL_NAME_REGEX =
+            "\\A([a-zA-Z][a-zA-Z0-9]*(?:\\.[a-zA-Z][a-zA-Z0-9]*)*)\\.([a-zA-Z][a-zA-Z0-9]*)\\z";
     private static final Pattern FULL_NAME_PATTERN = Pattern.compile(FULL_NAME_REGEX);
 
     private JsonNode schema;
@@ -66,6 +68,7 @@ public class JsonSchema implements Schema {
     public int hashCode() {
         return Schema.hashCode(this);
     }
+
     @Override
     public String toString() {
         return Schema.toString("JsonSchema", this);
@@ -84,6 +87,8 @@ public class JsonSchema implements Schema {
 
     @Override
     public String getDocumentation() {
-        return schema.get("description").asText();
+        return Optional.ofNullable(schema.get("description"))
+                       .map(JsonNode::asText)
+                       .orElse("");
     }
 }

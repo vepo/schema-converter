@@ -11,8 +11,8 @@ public class JsonSchemaTest {
     @Test
     void propertiesTest() {
         JsonSchema schema = new JsonSchema(getClass().getResourceAsStream("/json/sample-1.json"));
-        assertEquals("Fruits", schema.getName());
+        assertEquals("Person", schema.getName());
         assertThat(schema.getFields()).extracting(Field::name)
-                                      .containsExactly("fruits", "vegetables");
+                                      .containsExactly("name", "surname", "phones", "addresses");
     }
 }

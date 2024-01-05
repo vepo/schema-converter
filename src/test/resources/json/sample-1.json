@@ -1,38 +1,56 @@
 {
-    "$id": "https://example.com/arrays.schema.json",
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "description": "A representation of a person, company, organization, or place",
     "type": "object",
-    "title": "dev.vepo.Fruits",
+    "title": "dev.vepo.Person",
+    "description": "Object representing a person",
+    "required": [
+        "name",
+        "surname"
+    ],
     "properties": {
-        "fruits": {
+        "name": {
+            "type": "string"
+        },
+        "surname": {
+            "type": "string"
+        },
+        "phones": {
             "type": "array",
             "items": {
                 "type": "string"
             }
         },
-        "vegetables": {
+        "addresses": {
             "type": "array",
             "items": {
-                "$ref": "#/$defs/veggie"
-            }
-        }
-    },
-    "$defs": {
-        "veggie": {
-            "type": "object",
-            "required": [
-                "veggieName",
-                "veggieLike"
-            ],
-            "properties": {
-                "veggieName": {
-                    "type": "string",
-                    "description": "The name of the vegetable."
-                },
-                "veggieLike": {
-                    "type": "boolean",
-                    "description": "Do I like this vegetable?"
+                "type": "object",
+                "title": "dev.vepo.Address",
+                "properties": {
+                    "number": {
+                        "oneOf": [
+                            {
+                                "type": "null"
+                            },
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "integer"
+                            }
+                        ]
+                    },
+                    "street": {
+                        "type": "string"
+                    },
+                    "complement": {
+                        "oneOf": [
+                            {
+                                "type": "null"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    }
                 }
             }
         }
