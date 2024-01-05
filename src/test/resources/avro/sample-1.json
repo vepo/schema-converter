@@ -1,0 +1,35 @@
+{
+    "type": "record",
+    "namespace": "dev.vepo",
+    "name": "Fruits",
+    "doc": "A representation of a person, company, organization, or place",
+    "fields": [
+        {
+            "name": "fruits",
+            "type": {
+                "type": "array",
+                "items": "string"
+            }
+        },
+        {
+            "name": "vegetables",
+            "type": {
+                "type": "array",
+                "items": {
+                    "type": "record",
+                    "name": "veggie",
+                    "fields": [
+                        {
+                            "name": "veggieName",
+                            "type": "string"
+                        },
+                        {
+                            "name": "veggieLike",
+                            "type": "boolean"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
