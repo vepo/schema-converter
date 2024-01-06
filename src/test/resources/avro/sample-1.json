@@ -28,16 +28,16 @@
                     "name": "Address",
                     "fields": [
                         {
-                            "name": "street",
-                            "type": "string"
-                        },
-                        {
                             "name": "number",
                             "type": [
                                 "null",
                                 "string",
                                 "int"
                             ]
+                        },
+                        {
+                            "name": "street",
+                            "type": "string"
                         },
                         {
                             "name": "complement",

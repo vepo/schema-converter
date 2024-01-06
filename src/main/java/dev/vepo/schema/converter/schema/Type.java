@@ -1,5 +1,5 @@
 package dev.vepo.schema.converter.schema;
 
 public enum Type {
-    STRING, UNDEFINED, ARRAY
+    STRING, INTEGER, OBJECT, ARRAY, NULL, UNDEFINED
 }

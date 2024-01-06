@@ -34,6 +34,11 @@ public class JsonSchema implements Schema {
         }
     }
 
+    public JsonSchema(JsonNode schema) {
+        Objects.requireNonNull(schema, "Schema cannot be null!");
+        this.schema = schema;
+    }
+
     @Override
     public List<Field> getFields() {
         Iterable<Map.Entry<String, JsonNode>> properties = () -> schema.get("properties").fields();

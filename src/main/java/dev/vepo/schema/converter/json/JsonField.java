@@ -1,8 +1,14 @@
 package dev.vepo.schema.converter.json;
 
+import java.security.InvalidKeyException;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 import dev.vepo.schema.converter.schema.Field;
+import dev.vepo.schema.converter.schema.Schema;
 import dev.vepo.schema.converter.schema.Type;
 
 public class JsonField implements Field {
@@ -33,20 +39,43 @@ public class JsonField implements Field {
 
     @Override
     public boolean union() {
-        return false;
+        return spec.has("oneOf");
+    }
+
+    private static Type type(JsonNode specNode) {
+        if (specNode.has("type")) {
+            switch (specNode.get("type").asText()) {
+                case "string":
+                    return Type.STRING;
+                case "integer":
+                    return Type.INTEGER;
+                case "array":
+                    return Type.ARRAY;
+                case "object":
+                    return Type.OBJECT;
+                case "null":
+                    return Type.NULL;
+
+            }
+        }
+        return Type.UNDEFINED;
     }
 
     @Override
     public Type type() {
-        if (spec.has("type")) {
-            switch (spec.get("type").asText()) {
-                case "string":
-                    return Type.STRING;
-                case "array":
-                    return Type.ARRAY;
-            }
+        return type(spec);
+    }
+
+    @Override
+    public List<Type> types() {
+        if (spec.has("oneOf")) {
+            return IntStream.range(0, spec.get("oneOf").size())
+                            .mapToObj(spec.get("oneOf")::get)
+                            .map(JsonField::type)
+                            .collect(Collectors.toList());
+        } else {
+            throw new IllegalStateException("Not oneOf field!");
         }
-        return Type.UNDEFINED;
     }
 
     @Override
@@ -57,10 +86,17 @@ public class JsonField implements Field {
                 switch (items.get("type").asText()) {
                     case "string":
                         return Type.STRING;
+                    case "object":
+                        return Type.OBJECT;
                 }
             }
         }
         return Type.UNDEFINED;
+    }
+
+    @Override
+    public Schema elementSchema() {
+        return new JsonSchema(spec.get("items"));
     }
 
 }

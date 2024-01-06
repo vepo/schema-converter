@@ -1,6 +1,10 @@
 package dev.vepo.schema.converter.avro;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import dev.vepo.schema.converter.schema.Field;
+import dev.vepo.schema.converter.schema.Schema;
 import dev.vepo.schema.converter.schema.Type;
 
 public class AvroField implements Field {
@@ -32,16 +36,29 @@ public class AvroField implements Field {
         return field.schema().isUnion();
     }
 
-    @Override
-    public Type type() {
-        switch (field.schema().getType()) {
+    private static Type type(org.apache.avro.Schema.Type type) {
+        switch (type) {
             case STRING:
                 return Type.STRING;
             case ARRAY:
                 return Type.ARRAY;
-
         }
         return Type.UNDEFINED;
+    }
+
+    @Override
+    public Type type() {
+        return type(field.schema().getType());
+    }
+
+    @Override
+    public List<Type> types() {
+        return field.schema()
+                    .getTypes()
+                    .stream()
+                    .map(org.apache.avro.Schema::getType)
+                    .map(AvroField::type)
+                    .collect(Collectors.toList());
     }
 
     @Override
@@ -51,6 +68,11 @@ public class AvroField implements Field {
                 return Type.STRING;
         }
         return Type.UNDEFINED;
+    }
+
+    @Override
+    public Schema elementSchema() {
+        return new AvroSchema(field.schema().getElementType());
     }
 
 }
