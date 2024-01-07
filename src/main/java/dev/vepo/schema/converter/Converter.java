@@ -4,11 +4,10 @@ import java.util.List;
 
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.ArrayDefault;
-import org.apache.avro.SchemaBuilder.BaseTypeBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
 import org.apache.avro.SchemaBuilder.FieldDefault;
 import org.apache.avro.SchemaBuilder.FieldTypeBuilder;
-import org.apache.avro.SchemaBuilder.StringDefault;
+import org.apache.avro.SchemaBuilder.NullDefault;
 import org.apache.avro.SchemaBuilder.TypeBuilder;
 import org.apache.avro.SchemaBuilder.UnionAccumulator;
 import org.apache.avro.SchemaBuilder.UnionFieldTypeBuilder;
@@ -26,8 +25,8 @@ public class Converter {
                                                                                   UnionAccumulator<V> acc,
                                                                                   List<Type> types) {
         if (types.size() > 0) {
-            Type t = types.get(0);
-            switch (t) {
+            Type currentType = types.get(0);
+            switch (currentType) {
                 case STRING:
                     if (unionOf != null) {
                         return accumulate(null, unionOf.stringType(), types.subList(1, types.size()));
@@ -36,9 +35,23 @@ public class Converter {
                     }
                 case INTEGER:
                     if (unionOf != null) {
-                        return accumulate(null, unionOf.intType(), types.subList(1, types.size()));
+                        return accumulate(null,
+                                          unionOf.intType().and().longType(),
+                                          types.subList(1, types.size()));
                     } else {
-                        return accumulate(null, acc.and().intType(), types.subList(1, types.size()));
+                        return accumulate(null,
+                                          acc.and().intType().and().longType(),
+                                          types.subList(1, types.size()));
+                    }
+                case NUMBER:
+                    if (unionOf != null) {
+                        return accumulate(null,
+                                          unionOf.intType().and().longType().and().floatType().and().doubleType(),
+                                          types.subList(1, types.size()));
+                    } else {
+                        return accumulate(null,
+                                          acc.and().intType().and().longType().and().floatType().and().doubleType(),
+                                          types.subList(1, types.size()));
                     }
                 case NULL:
                     if (unionOf != null) {
@@ -60,24 +73,107 @@ public class Converter {
             if (f.union()) {
                 builder = (FieldAssembler<T>) accumulate(fieldBuilder.unionOf(), null, f.types());
             } else {
+                Schema itemSchema;
                 switch (f.type()) {
                     case STRING:
-                        builder = fieldBuilder.stringType().noDefault();
+                        if (f.required()) {
+                            builder = fieldBuilder.stringType().noDefault();
+                        } else {
+                            builder = fieldBuilder.unionOf().nullType().and().stringType().endUnion().noDefault();
+                        }
                         break;
                     case INTEGER:
-                        builder = fieldBuilder.intType().noDefault();
+                        if (f.required()) {
+                            builder = fieldBuilder.unionOf()
+                                                  .intType().and()
+                                                  .longType().endUnion().noDefault();
+                        } else {
+                            builder = fieldBuilder.unionOf()
+                                                  .nullType().and()
+                                                  .intType().and()
+                                                  .longType().endUnion().noDefault();
+                        }
+                        break;
+                    case NUMBER:
+                        if (f.required()) {
+                            builder = fieldBuilder.unionOf()
+                                                  .intType().and()
+                                                  .longType().and()
+                                                  .floatType().and()
+                                                  .doubleType().endUnion().noDefault();
+                        } else {
+                            builder = fieldBuilder.unionOf()
+                                                  .nullType().and()
+                                                  .intType().and()
+                                                  .longType().and()
+                                                  .floatType().and()
+                                                  .doubleType().endUnion().noDefault();
+                        }
+                        break;
+                    case OBJECT:
+                        itemSchema = f.elementSchema();
+                        if (f.required()) {
+                            builder = buildFields(fieldBuilder.record(itemSchema.getName()).fields(),
+                                                  itemSchema).endRecord()
+                                                             .noDefault();
+                        } else {
+                            builder = buildFields(fieldBuilder.unionOf()
+                                                              .nullType().and()
+                                                              .record(itemSchema.getName()).fields(),
+                                                  itemSchema).endRecord().endUnion()
+                                                             .noDefault();
+                        }
                         break;
                     case ARRAY:
-                        TypeBuilder<ArrayDefault<T>> arrayBuilder = fieldBuilder.array().items();
-                        switch (f.items()) {
-                            case STRING:
-                                builder = arrayBuilder.stringType().noDefault();
-                                break;
-                            case OBJECT:
-                                Schema itemSchema = f.elementSchema();
-                                builder = buildFields(arrayBuilder.record(itemSchema.getName()).fields(),
-                                                      itemSchema).endRecord()
-                                                                 .noDefault();
+                        if (f.required()) {
+                            TypeBuilder<ArrayDefault<T>> arrayBuilder = fieldBuilder.array().items();
+                            switch (f.items()) {
+                                case STRING:
+                                    builder = arrayBuilder.stringType().noDefault();
+                                    break;
+                                case INTEGER:
+                                    builder = arrayBuilder.unionOf()
+                                                          .intType().and()
+                                                          .longType().endUnion().noDefault();
+                                    break;
+                                case NUMBER:
+                                    builder = arrayBuilder.unionOf()
+                                                          .intType().and()
+                                                          .longType().and()
+                                                          .floatType().and()
+                                                          .doubleType().endUnion().noDefault();
+                                    break;
+                                case OBJECT:
+                                    itemSchema = f.elementSchema();
+                                    builder = buildFields(arrayBuilder.record(itemSchema.getName()).fields(),
+                                                          itemSchema).endRecord()
+                                                                     .noDefault();
+                            }
+                        } else {
+                            TypeBuilder<UnionAccumulator<NullDefault<T>>> arrayBuilder =
+                                    fieldBuilder.unionOf().nullType().and().array().items();
+                            switch (f.items()) {
+                                case STRING:
+                                    builder = arrayBuilder.stringType().endUnion().noDefault();
+                                    break;
+                                case INTEGER:
+                                    builder = arrayBuilder.unionOf()
+                                                          .intType().and()
+                                                          .longType().endUnion().endUnion().noDefault();
+                                    break;
+                                case NUMBER:
+                                    builder = arrayBuilder.unionOf()
+                                                          .intType().and()
+                                                          .longType().and()
+                                                          .floatType().and()
+                                                          .doubleType().endUnion().endUnion().noDefault();
+                                    break;
+                                case OBJECT:
+                                    itemSchema = f.elementSchema();
+                                    builder = buildFields(arrayBuilder.record(itemSchema.getName()).fields(),
+                                                          itemSchema).endRecord().endUnion()
+                                                                     .noDefault();
+                            }
                         }
                         break;
                     case NULL:

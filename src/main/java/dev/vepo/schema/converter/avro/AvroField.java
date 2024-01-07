@@ -43,7 +43,7 @@ public class AvroField implements Field {
             case ARRAY:
                 return Type.ARRAY;
         }
-        return Type.UNDEFINED;
+        throw new IllegalStateException("Not implemented item!");
     }
 
     @Override
@@ -67,12 +67,17 @@ public class AvroField implements Field {
             case STRING:
                 return Type.STRING;
         }
-        return Type.UNDEFINED;
+        throw new IllegalStateException("Not implemented item!");
     }
 
     @Override
     public Schema elementSchema() {
         return new AvroSchema(field.schema().getElementType());
+    }
+
+    @Override
+    public boolean required() {
+        return !field.schema().isNullable();
     }
 
 }

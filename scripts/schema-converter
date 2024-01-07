@@ -14,23 +14,31 @@
 
 import static io.confluent.connect.json.JsonSchemaDataConfig.USE_OPTIONAL_FOR_NON_REQUIRED_CONFIG;
 
-import picocli.CommandLine;
-import picocli.CommandLine.*;
 import java.io.File;
-import java.util.*;
+import java.nio.file.Files;
+import java.util.concurrent.Callable;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.avro.Schema.Parser;
-import org.apache.avro.Schema;
 
 import io.confluent.connect.avro.AvroData;
 import io.confluent.connect.json.JsonSchemaData;
 import io.confluent.connect.json.JsonSchemaDataConfig;
 import io.confluent.kafka.schemaregistry.json.JsonSchema;
+import io.confluent.kafka.schemaregistry.json.JsonSchema;
 
-import java.util.concurrent.Callable;
+import org.apache.avro.Schema;
+import org.apache.avro.Schema.Parser;
 
-@Command(name = "SchemaConverter", mixinStandardHelpOptions = true, version = "SchemaConverter 0.1",
-        description = "SchemaConverter made with jbang")
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+
+@Command(name = "SchemaConverter", 
+         mixinStandardHelpOptions = true, 
+         version = "SchemaConverter 0.1",
+         description = "SchemaConverter made with jbang")
 class SchemaConverter implements Callable<Integer> {
 
     enum Type {AVRO2JSON, JSON2AVRO}
@@ -54,10 +62,15 @@ class SchemaConverter implements Callable<Integer> {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonSchemaData jsonData = new JsonSchemaData(new JsonSchemaDataConfig(jsonSchemaDataConfigMap));
         AvroData avroData = new AvroData(1000);
-        Parser parser = new Parser();
-        Schema schema = parser.parse(input);
-        System.out.println(schema);
-        System.out.println(jsonData.fromConnectSchema(avroData.toConnectSchema(schema)));
+        if (type == Type.AVRO2JSON) {
+            Parser parser = new Parser();
+            Schema schema = parser.parse(input);
+            System.out.println(schema);
+            System.out.println(jsonData.fromConnectSchema(avroData.toConnectSchema(schema)));
+        } else if (type == Type.JSON2AVRO) {
+            JsonSchema schema = new JsonSchema(new String(Files.readAllBytes(input.toPath())));
+            System.out.println(avroData.fromConnectSchema(jsonData.toConnectSchema(schema)));
+        }
         return 0;
     }
 }

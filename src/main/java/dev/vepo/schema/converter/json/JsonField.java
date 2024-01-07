@@ -1,6 +1,5 @@
 package dev.vepo.schema.converter.json;
 
-import java.security.InvalidKeyException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -15,10 +14,12 @@ public class JsonField implements Field {
 
     private String name;
     private JsonNode spec;
+    private boolean required;
 
-    public JsonField(String name, JsonNode spec) {
+    public JsonField(String name, JsonNode spec, boolean required) {
         this.name = name;
         this.spec = spec;
+        this.required = required;
     }
 
     @Override
@@ -49,6 +50,8 @@ public class JsonField implements Field {
                     return Type.STRING;
                 case "integer":
                     return Type.INTEGER;
+                case "number":
+                    return Type.NUMBER;
                 case "array":
                     return Type.ARRAY;
                 case "object":
@@ -58,7 +61,7 @@ public class JsonField implements Field {
 
             }
         }
-        return Type.UNDEFINED;
+        throw new IllegalStateException("Not implemented item!");
     }
 
     @Override
@@ -91,12 +94,17 @@ public class JsonField implements Field {
                 }
             }
         }
-        return Type.UNDEFINED;
+        throw new IllegalStateException("Not implemented item!");
     }
 
     @Override
     public Schema elementSchema() {
         return new JsonSchema(spec.get("items"));
+    }
+
+    @Override
+    public boolean required() {
+        return required && (!union() || !types().contains(Type.NULL));
     }
 
 }

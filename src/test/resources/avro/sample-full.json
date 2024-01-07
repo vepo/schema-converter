@@ -1,0 +1,103 @@
+{
+    "type": "record",
+    "namespace": "dev.vepo",
+    "name": "FullObject",
+    "doc": "Object with all AVRO types",
+    "fields": [
+        {
+            "name": "stringField",
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        {
+            "name": "requiredStringField",
+            "type": "string"
+        },
+        {
+            "name": "optionalStringField",
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        {
+            "name": "requiredStringFieldWithNull",
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        {
+            "name": "numberField",
+            "type": [
+                "null",
+                "int",
+                "long",
+                "float",
+                "double"
+            ]
+        },
+        {
+            "name": "requiredNumberField",
+            "type": [
+                "int",
+                "long",
+                "float",
+                "double"
+            ]
+        },
+        {
+            "name": "optionalNumberField",
+            "type": [
+                "null",
+                "int",
+                "long",
+                "float",
+                "double"
+            ]
+        },
+        {
+            "name": "requiredNumberFieldWithNull",
+            "type": [
+                "null",
+                "int",
+                "long",
+                "float",
+                "double"
+            ]
+        },
+        {
+            "name": "integerField",
+            "type": [
+                "null",
+                "int",
+                "long"
+            ]
+        },
+        {
+            "name": "requiredIntegerField",
+            "type": [
+                "int",
+                "long"
+            ]
+        },
+        {
+            "name": "optionalIntegerField",
+            "type": [
+                "null",
+                "int",
+                "long"
+            ]
+        },
+        {
+            "name": "requiredIntegerFieldWithNull",
+            "type": [
+                "null",
+                "int",
+                "long"
+            ]
+        }
+    ]
+}

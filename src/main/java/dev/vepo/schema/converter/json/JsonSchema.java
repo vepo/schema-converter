@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,8 +44,18 @@ public class JsonSchema implements Schema {
     public List<Field> getFields() {
         Iterable<Map.Entry<String, JsonNode>> properties = () -> schema.get("properties").fields();
         return StreamSupport.stream(properties.spliterator(), false)
-                            .map(spec -> new JsonField(spec.getKey(), spec.getValue()))
+                            .map(spec -> new JsonField(spec.getKey(), spec.getValue(), isRequired(spec.getKey())))
                             .collect(Collectors.toList());
+    }
+
+    private boolean isRequired(String key) {
+        if (schema.has("required")) {
+            return IntStream.range(0, schema.get("required").size())
+                            .mapToObj(index -> schema.get("required").get(index))
+                            .map(property -> property.asText())
+                            .anyMatch(p -> p.equals(key));
+        }
+        return false;
     }
 
     @Override

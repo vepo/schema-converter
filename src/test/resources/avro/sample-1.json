@@ -14,41 +14,51 @@
         },
         {
             "name": "phones",
-            "type": {
-                "type": "array",
-                "items": "string"
-            }
+            "type": [
+                "null",
+                {
+                    "type": "array",
+                    "items": "string"
+                }
+            ]
         },
         {
             "name": "addresses",
-            "type": {
-                "type": "array",
-                "items": {
-                    "type": "record",
-                    "name": "Address",
-                    "fields": [
-                        {
-                            "name": "number",
-                            "type": [
-                                "null",
-                                "string",
-                                "int"
-                            ]
-                        },
-                        {
-                            "name": "street",
-                            "type": "string"
-                        },
-                        {
-                            "name": "complement",
-                            "type": [
-                                "null",
-                                "string"
-                            ]
-                        }
-                    ]
+            "type": [
+                "null",
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "record",
+                        "name": "Address",
+                        "fields": [
+                            {
+                                "name": "number",
+                                "type": [
+                                    "null",
+                                    "string",
+                                    "int",
+                                    "long"
+                                ]
+                            },
+                            {
+                                "name": "street",
+                                "type": [
+                                    "null",
+                                    "string"
+                                ]
+                            },
+                            {
+                                "name": "complement",
+                                "type": [
+                                    "null",
+                                    "string"
+                                ]
+                            }
+                        ]
+                    }
                 }
-            }
+            ]
         }
     ]
 }

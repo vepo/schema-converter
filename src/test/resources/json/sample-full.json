@@ -1,0 +1,93 @@
+{
+    "type": "object",
+    "title": "dev.vepo.FullObject",
+    "description": "Object with all AVRO types",
+    "required": [
+        "requiredStringField",
+        "requiredStringFieldWithNull",
+        "requiredNumberField",
+        "requiredNumberFieldWithNull",
+        "requiredIntegerField",
+        "requiredIntegerFieldWithNull"
+    ],
+    "properties": {
+        "stringField": {
+            "type": "string"
+        },
+        "requiredStringField": {
+            "type": "string"
+        },
+        "optionalStringField": {
+            "oneOf": [
+                {
+                    "type": "null"
+                },
+                {
+                    "type": "string"
+                }
+            ]
+        },
+        "requiredStringFieldWithNull": {
+            "oneOf": [
+                {
+                    "type": "null"
+                },
+                {
+                    "type": "string"
+                }
+            ]
+        },
+        "numberField": {
+            "type": "number"
+        },
+        "requiredNumberField": {
+            "type": "number"
+        },
+        "optionalNumberField": {
+            "oneOf": [
+                {
+                    "type": "null"
+                },
+                {
+                    "type": "number"
+                }
+            ]
+        },
+        "requiredNumberFieldWithNull": {
+            "oneOf": [
+                {
+                    "type": "null"
+                },
+                {
+                    "type": "number"
+                }
+            ]
+        },
+        "integerField": {
+            "type": "integer"
+        },
+        "requiredIntegerField": {
+            "type": "integer"
+        },
+        "optionalIntegerField": {
+            "oneOf": [
+                {
+                    "type": "null"
+                },
+                {
+                    "type": "integer"
+                }
+            ]
+        },
+        "requiredIntegerFieldWithNull": {
+            "oneOf": [
+                {
+                    "type": "null"
+                },
+                {
+                    "type": "integer"
+                }
+            ]
+        }
+    }
+}
